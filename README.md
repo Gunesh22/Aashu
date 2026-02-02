@@ -24,13 +24,6 @@ It features heartfelt messages, beautiful images, smooth animations, and scrolli
 
 ---
 
-## 🚀 Live Demo
-
-👉 **[View the website here](YOUR_DEPLOYED_LINK)**  
-*(Replace this with your Vercel / Netlify link)*
-
----
-
 ## 📂 Project Structure
 
 ```text
