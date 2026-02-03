@@ -3,6 +3,7 @@
     - Hides HTML tags from user
     - Handles Newlines cleanly
     - Reconstructs structure automatically
+    - Shows Upload Progress Bars
 */
 
 // Real Config
@@ -300,28 +301,66 @@ async function saveAdminChanges() {
     const toast = document.getElementById('status-toast');
     btn.disabled = true;
     toast.style.display = 'block';
-    toast.innerText = "Uploading & Saving...";
+
+    // Create Progress Container
+    toast.innerHTML = '<b>Saving Changes...</b><div id="upload-list" style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2);"></div>';
+    const list = document.getElementById('upload-list');
 
     try {
         const updates = {};
+
         if (pendingUploads.size > 0) {
-            const promises = Array.from(pendingUploads.entries()).map(async ([id, file]) => {
-                const ref = storage.ref().child(`uploads/${Date.now()}_${file.name}`);
-                await ref.put(file);
-                const url = await ref.getDownloadURL();
-                updates[id] = url;
+            // Map uploads to tasks to track progress
+            const uploadPromises = Array.from(pendingUploads.entries()).map(([id, file]) => {
+                return new Promise((resolve, reject) => {
+                    // Create UI Item
+                    const item = document.createElement('div');
+                    item.style.marginBottom = '8px';
+                    item.style.fontSize = '12px';
+                    item.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
+                            <span>${file.name.substring(0, 15)}...</span>
+                            <span id="text-${id}">0%</span>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.2); height:4px; border-radius:2px; overflow:hidden;">
+                            <div id="bar-${id}" style="background:#4cd137; height:100%; width:0%; transition:width 0.2s;"></div>
+                        </div>
+                    `;
+                    list.appendChild(item);
+
+                    const ref = storage.ref().child(`uploads/${Date.now()}_${file.name}`);
+                    const task = ref.put(file);
+
+                    task.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            const p = Math.round(progress);
+                            const bar = document.getElementById(`bar-${id}`);
+                            const text = document.getElementById(`text-${id}`);
+                            if (bar) bar.style.width = `${p}%`;
+                            if (text) text.innerText = `${p}%`;
+                        },
+                        (error) => reject(error),
+                        async () => {
+                            const url = await task.snapshot.ref.getDownloadURL();
+                            updates[id] = url;
+                            const text = document.getElementById(`text-${id}`);
+                            if (text) text.innerText = "✅";
+                            resolve();
+                        }
+                    );
+                });
             });
-            await Promise.all(promises);
+            await Promise.all(uploadPromises);
             pendingUploads.clear();
         }
 
+        // Save Text fields
         cmsSchema.forEach(section => {
             section.fields.forEach(field => {
                 if (field.type !== 'image') {
                     const el = document.getElementById(`input-${field.id}`);
                     if (el) {
-                        // STORE AS RAW NEWLINES (Database agnostic)
-                        // View logic handles the conversion to <br>
                         updates[field.id] = el.value;
                     }
                 }
@@ -330,12 +369,12 @@ async function saveAdminChanges() {
 
         await db.collection(collectionName).doc(docId).set(updates, { merge: true });
 
-        toast.innerText = "✅ Saved!";
+        toast.innerHTML = "✅ <b>Saved Successfully!</b>";
         setTimeout(() => toast.style.display = 'none', 2000);
 
     } catch (e) {
         console.error(e);
-        toast.innerText = "❌ Error: " + e.message;
+        toast.innerHTML = "❌ Error: " + e.message;
     } finally {
         btn.disabled = false;
     }
