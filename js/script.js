@@ -309,4 +309,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
+
+    /* --- Hybrid Marquee Scroll (Auto + Manual) --- */
+    const marqueeContainer = document.querySelector('.marquee-container');
+    if (marqueeContainer) {
+        let isAutoScrolling = true;
+        let lastScrollLeft = 0;
+
+        function autoScrollLoop() {
+            if (isAutoScrolling) {
+                // If user hasn't scrolled manually recently
+                marqueeContainer.scrollLeft += 0.5; // Adjust speed (px per frame)
+
+                // Infinite Loop Logic checking (assuming content is duplicated)
+                // If we scrolled past half the width (approx), reset to 0
+                if (marqueeContainer.scrollLeft >= (marqueeContainer.scrollWidth / 2)) {
+                    if (marqueeContainer.scrollLeft > 100) { // Safety check
+                        marqueeContainer.scrollLeft = 0;
+                    }
+                }
+            }
+            requestAnimationFrame(autoScrollLoop);
+        }
+
+        // Start Loop
+        autoScrollLoop();
+
+        // Pause on Interaction
+        const pause = () => isAutoScrolling = false;
+        const resume = () => isAutoScrolling = true;
+
+        marqueeContainer.addEventListener('mousedown', pause);
+        marqueeContainer.addEventListener('touchstart', pause, { passive: true });
+
+        marqueeContainer.addEventListener('mouseup', resume);
+        marqueeContainer.addEventListener('mouseleave', resume);
+        marqueeContainer.addEventListener('touchend', () => setTimeout(resume, 1000)); // Delay resume on mobile
+    }
+
 });
