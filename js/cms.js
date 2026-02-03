@@ -306,11 +306,14 @@ async function saveAdminChanges() {
     toast.innerHTML = '<b>Saving Changes...</b><div id="upload-list" style="margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2);"></div>';
     const list = document.getElementById('upload-list');
 
+    // ImgBB API Key
+    const IMGBB_KEY = "c7585a606e34c2d3dc8745bf17fcfdb3";
+
     try {
         const updates = {};
 
         if (pendingUploads.size > 0) {
-            // Map uploads to tasks to track progress
+            // Map uploads to tasks
             const uploadPromises = Array.from(pendingUploads.entries()).map(([id, file]) => {
                 return new Promise((resolve, reject) => {
                     // Create UI Item
@@ -328,34 +331,49 @@ async function saveAdminChanges() {
                     `;
                     list.appendChild(item);
 
-                    const ref = storage.ref().child(`uploads/${Date.now()}_${file.name}`);
-                    const task = ref.put(file);
+                    // Use XMLHttpRequest for Progress tracking with ImgBB
+                    const formData = new FormData();
+                    formData.append("image", file);
 
-                    task.on('state_changed',
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            const p = Math.round(progress);
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("POST", `https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, true);
+
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const percentComplete = (e.loaded / e.total) * 100;
+                            const p = Math.round(percentComplete);
                             const bar = document.getElementById(`bar-${id}`);
                             const text = document.getElementById(`text-${id}`);
                             if (bar) bar.style.width = `${p}%`;
                             if (text) text.innerText = `${p}%`;
-                        },
-                        (error) => reject(error),
-                        async () => {
-                            const url = await task.snapshot.ref.getDownloadURL();
-                            updates[id] = url;
-                            const text = document.getElementById(`text-${id}`);
-                            if (text) text.innerText = "✅";
-                            resolve();
                         }
-                    );
+                    };
+
+                    xhr.onload = () => {
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                updates[id] = response.data.url;
+                                const text = document.getElementById(`text-${id}`);
+                                if (text) text.innerText = "✅";
+                                resolve();
+                            } else {
+                                reject(new Error("ImgBB Error: " + (response.error ? response.error.message : "Unknown")));
+                            }
+                        } else {
+                            reject(new Error("Upload failed. Status: " + xhr.status));
+                        }
+                    };
+
+                    xhr.onerror = () => reject(new Error("Network connection failed"));
+                    xhr.send(formData);
                 });
             });
             await Promise.all(uploadPromises);
             pendingUploads.clear();
         }
 
-        // Save Text fields
+        // Save Text fields to Firestore (Still needed!)
         cmsSchema.forEach(section => {
             section.fields.forEach(field => {
                 if (field.type !== 'image') {
@@ -367,10 +385,13 @@ async function saveAdminChanges() {
             });
         });
 
-        await db.collection(collectionName).doc(docId).set(updates, { merge: true });
-
-        toast.innerHTML = "✅ <b>Saved Successfully!</b>";
-        setTimeout(() => toast.style.display = 'none', 2000);
+        if (db) {
+            await db.collection(collectionName).doc(docId).set(updates, { merge: true });
+            toast.innerHTML = "✅ <b>Saved Successfully!</b>";
+            setTimeout(() => toast.style.display = 'none', 2000);
+        } else {
+            throw new Error("Firestore DB not connected. Text saved locally only (refreshing will lose it).");
+        }
 
     } catch (e) {
         console.error(e);
