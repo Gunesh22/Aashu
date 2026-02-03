@@ -364,25 +364,10 @@ h3 {
 }
 
 /* Fade mask for marquee edges */
+/* Gradients removed as requested */
 .marquee-container::before,
 .marquee-container::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 100px;
-    z-index: 2;
-    pointer-events: none;
-}
-
-.marquee-container::before {
-    left: 0;
-    background: linear-gradient(to right, var(--bg-base), transparent);
-}
-
-.marquee-container::after {
-    right: 0;
-    background: linear-gradient(to left, var(--bg-base), transparent);
+    display: none;
 }
 
 
@@ -395,8 +380,9 @@ h3 {
 }
 
 /* Pause on hover */
+/* Pause on hover disabled */
 .marquee-content:hover {
-    animation-play-state: paused;
+    animation-play-state: running;
 }
 
 @keyframes scrollHorizontal {
@@ -426,11 +412,12 @@ h3 {
     flex-direction: column;
 }
 
+/* Hover lift disabled */
 .memory-card:hover {
-    transform: translateY(-15px) scale(1.02);
-    box-shadow: var(--shadow-float);
-    background: white;
-    z-index: 5;
+    transform: none;
+    box-shadow: var(--shadow-soft);
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 1;
 }
 
 .memory-img {
@@ -445,8 +432,9 @@ h3 {
     transition: transform 0.6s ease;
 }
 
+/* Image scale on hover disabled */
 .memory-card:hover .memory-img img {
-    transform: scale(1.1);
+    transform: none;
 }
 
 .memory-info {
