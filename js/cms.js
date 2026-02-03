@@ -6,6 +6,7 @@
     - Shows Upload Progress Bars
     - Compresses Images before Upload
     - Supports Date Picker
+    - Manual Image Cropping (WhatsApp Style)
 */
 
 // Not using Firebase Config anymore for Storage, but needed for Firestore
@@ -24,7 +25,6 @@ if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
 }
 
 let db = typeof firebase !== 'undefined' ? firebase.firestore() : null;
-// let storage = firebase.storage(); // DISABLED
 
 const collectionName = "site_content";
 const docId = "main_content";
@@ -41,33 +41,81 @@ function newlineToBr(text) {
 }
 
 // --- HELPER: IMAGE COMPRESSION ---
-function compressImage(file) {
+function compressImage(file) { // Used if skipping crop or post-crop
     return new Promise((resolve) => {
         const img = new Image();
         img.src = URL.createObjectURL(file);
         img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const maxWidth = 1000; // Limit width to 1000px
-            const scale = maxWidth / img.width;
-
-            // If already small, return original
-            if (scale >= 1) {
-                resolve(file);
-                return;
-            }
-
-            canvas.width = maxWidth;
-            canvas.height = img.height * scale;
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            // Compress to JPEG 80%
-            canvas.toBlob(blob => {
-                resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-            }, 'image/jpeg', 0.8);
+            // Basic compression
+            resolve(file); // Placeholder if we rely on Cropper's compression
         }
     });
 }
+
+// --- HELPER: CROPPER UI ---
+let cropperInstance = null;
+
+function openCropper(file, callback) {
+    const modal = document.getElementById('cropper-modal');
+    const imgEl = document.getElementById('cropper-target-img');
+    const confirmBtn = document.getElementById('crop-confirm');
+    const cancelBtn = document.getElementById('crop-cancel');
+
+    if (!modal || !imgEl) return;
+
+    // Load image
+    const url = URL.createObjectURL(file);
+    imgEl.src = url;
+    modal.style.display = 'flex';
+
+    // Init Cropper
+    if (cropperInstance) cropperInstance.destroy();
+    cropperInstance = new Cropper(imgEl, {
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 0.9,
+        responsive: true,
+        aspectRatio: 9 / 16, // Forced 9:16
+    });
+
+    // Handlers
+    const onConfirm = () => {
+        if (cropperInstance) {
+            cropperInstance.getCroppedCanvas({
+                maxWidth: 1000, // Optimize size directly here
+                maxHeight: 1000,
+                fillColor: '#fff',
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            }).toBlob((blob) => {
+                // Ensure name is preserved
+                const newFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+                callback(newFile);
+                cleanup();
+            }, 'image/jpeg', 0.85);
+        }
+    };
+
+    const onCancel = () => {
+        cleanup();
+    };
+
+    function cleanup() {
+        modal.style.display = 'none';
+        if (cropperInstance) {
+            cropperInstance.destroy();
+            cropperInstance = null;
+        }
+        imgEl.src = '';
+        // Remove listeners to avoid dupes
+        confirmBtn.removeEventListener('click', onConfirm);
+        cancelBtn.removeEventListener('click', onCancel);
+    }
+
+    confirmBtn.addEventListener('click', onConfirm);
+    cancelBtn.addEventListener('click', onCancel);
+}
+
 
 // --- SCHEMA ---
 const cmsSchema = [
@@ -266,23 +314,26 @@ function generateAdminUI() {
                 fileIn.type = 'file';
                 fileIn.id = `file-${field.id}`;
                 fileIn.accept = 'image/*';
-                fileIn.addEventListener('change', async (e) => {
+                fileIn.addEventListener('change', (e) => {
+                    // OPEN CROPPER INSTEAD OF DIRECT UPLOAD
                     if (e.target.files[0]) {
-                        // Compress Image Here
-                        const f = e.target.files[0];
-                        const compressed = await compressImage(f);
+                        const file = e.target.files[0];
+                        openCropper(file, (croppedBlob) => {
+                            pendingUploads.set(field.id, croppedBlob);
 
-                        pendingUploads.set(field.id, compressed);
-
-                        const reader = new FileReader();
-                        reader.onload = (ev) => img.src = ev.target.result;
-                        reader.readAsDataURL(compressed);
+                            // Update preview with cropped result
+                            const reader = new FileReader();
+                            reader.onload = (ev) => img.src = ev.target.result;
+                            reader.readAsDataURL(croppedBlob);
+                        });
+                        // Reset input so same file can trigger change again if cancelled/re-picked
+                        fileIn.value = '';
                     }
                 });
 
                 const btn = document.createElement('label');
                 btn.className = 'file-upload-btn';
-                btn.innerText = "📂 Upload New";
+                btn.innerText = "📂 Upload & Crop";
                 btn.setAttribute('for', `file-${field.id}`);
 
                 row.appendChild(img);
@@ -367,10 +418,9 @@ async function saveAdminChanges() {
 
                     // Use XMLHttpRequest for Progress tracking with ImgBB
                     const formData = new FormData();
-                    formData.append("image", file);
+                    formData.append("image", file); // Cropped Blob is here
 
                     const xhr = new XMLHttpRequest();
-                    // Optional: Append name to upload? ImgBB handles it.
                     xhr.open("POST", `https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, true);
 
                     xhr.upload.onprogress = (e) => {
