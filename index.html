@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Our Anniversary Story</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
     <!-- Styles -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/styles-mobile.css">
 </head>
+
 <body>
 
     <!-- Confetti Canvas -->
@@ -31,12 +35,13 @@
         <!-- Hero Section -->
         <section id="hero" class="hero-section">
             <div class="hero-content fade-in-up">
-                <h1 class="hero-title">To the girl who<br>owns my heart...<span>💖</span></h1>
-                <p class="hero-date"><b>Happy Birthday my gurll...</b><br>We are together from :</p>
+                <h1 class="hero-title editable-text" data-cms-id="hero-title">Aashu & Jasveer<br><span>💖</span></h1>
+                <p class="hero-date editable-text" data-cms-id="hero-subtitle"><b>We’re building a life
+                        together.</b><br>We are together from :</p>
 
                 <div class="relationship-timer" id="relationship-timer">
                     <div class="timer-item"><span id="years">00</span><label>Years</label></div>
-                    
+
                     <div class="timer-item"><span id="months">00</span><label>Months</label></div>
                     <div class="separator">:</div>
                     <div class="timer-item"><span id="days">00</span><label>Days</label></div>
@@ -50,16 +55,26 @@
 
                 <button class="btn-primary" onclick="scrollToSection('story')">Start Our Story &rarr;</button>
             </div>
-            
+
             <div class="hero-visual fade-in-delayed">
                 <div class="photo-scroll-strip" id="photo-scroll">
                     <!-- Images will be injected here or hardcoded -->
                     <div class="scroll-track">
-                        <div class="photo-card"><img src="https://placehold.co/400x500?text=Memory+1" alt="Memory"></div>
-                        <div class="photo-card"><img src="https://placehold.co/400x500?text=Memory+2" alt="Memory"></div>
-                        <div class="photo-card"><img src="https://placehold.co/400x500?text=Memory+3" alt="Memory"></div>
-                        <div class="photo-card"><img src="https://placehold.co/400x500?text=Memory+4" alt="Memory"></div>
-                        <div class="photo-card"><img src="https://placehold.co/400x500?text=Memory+5" alt="Memory"></div>
+                        <div class="photo-card"><img class="editable-image" data-cms-id="hero-scroll-1"
+                                src="https://placehold.co/400x500?text=Memory+1" alt="Memory">
+                        </div>
+                        <div class="photo-card"><img class="editable-image" data-cms-id="hero-scroll-2"
+                                src="https://placehold.co/400x500?text=Memory+2" alt="Memory">
+                        </div>
+                        <div class="photo-card"><img class="editable-image" data-cms-id="hero-scroll-3"
+                                src="https://placehold.co/400x500?text=Memory+3" alt="Memory">
+                        </div>
+                        <div class="photo-card"><img class="editable-image" data-cms-id="hero-scroll-4"
+                                src="https://placehold.co/400x500?text=Memory+4" alt="Memory">
+                        </div>
+                        <div class="photo-card"><img class="editable-image" data-cms-id="hero-scroll-5"
+                                src="https://placehold.co/400x500?text=Memory+5" alt="Memory">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,58 +83,66 @@
         <!-- Our Story / Memories Section -->
         <section id="story" class="section story-section">
             <h2 class="section-title text-center">Memories We Made...✨</h2>
-            
+
             <div class="marquee-container">
                 <div class="marquee-content">
                     <!-- Duplicate items for seamless loop -->
                     <!-- Item 1 -->
                     <div class="memory-card">
                         <div class="memory-img">
-                            <img src="https://placehold.co/400x500?text=1st+Birthday" alt="Your 1st birthday">
+                            <img class="editable-image" data-cms-id="memory-1-img"
+                                src="https://placehold.co/400x500?text=1st+Birthday" alt="Your 1st birthday">
                         </div>
                         <div class="memory-info">
-                            <h3>Your 1st birthday</h3>
-                            <p>The day that I knew i would celebrate the rest of my life with you</p>
+                            <h3 class="editable-text" data-cms-id="memory-1-title">Your 1st birthday</h3>
+                            <p class="editable-text" data-cms-id="memory-1-desc">The day that I knew i would celebrate
+                                the rest of my life with you</p>
                         </div>
                     </div>
                     <!-- Item 2 -->
                     <div class="memory-card">
                         <div class="memory-img">
-                            <img src="https://placehold.co/400x500?text=Movie+Date" alt="Our Movie date">
+                            <img class="editable-image" data-cms-id="memory-2-img"
+                                src="https://placehold.co/400x500?text=Movie+Date" alt="Our Movie date">
                         </div>
                         <div class="memory-info">
-                            <h3>Our Movie date</h3>
-                            <p>Just you, me, and apni movie</p>
+                            <h3 class="editable-text" data-cms-id="memory-2-title">Our Movie date</h3>
+                            <p class="editable-text" data-cms-id="memory-2-desc">Just you, me, and apni movie</p>
                         </div>
                     </div>
                     <!-- Item 3 -->
                     <div class="memory-card">
                         <div class="memory-img">
-                            <img src="https://placehold.co/400x500?text=memory-card" alt="Trip">
+                            <img class="editable-image" data-cms-id="memory-3-img"
+                                src="https://placehold.co/400x500?text=memory-card" alt="Trip">
                         </div>
                         <div class="memory-info">
-                            <h3>Trip</h3>
-                            <p>Just you, me, and apni trip</p>
+                            <h3 class="editable-text" data-cms-id="memory-3-title">Trip</h3>
+                            <p class="editable-text" data-cms-id="memory-3-desc">Just you, me, and apni trip</p>
                         </div>
                     </div>
-                     <!-- Item 4 -->
-                     <div class="memory-card">
-                         <div class="memory-img">
-                             <img src="https://placehold.co/400x500?text=memory-card" alt="Bike ride">
-                         </div>
-                         <div class="memory-info">
-                             <h3>Bike ride</h3>
-                             <p>Every trip is a story I want to write with you.</p>
-                         </div>
-                     </div>
-                     <!-- Item 5 -->
+                    <!-- Item 4 -->
                     <div class="memory-card">
                         <div class="memory-img">
-                            <img src="https://placehold.co/400x500?text=memory-card" alt="days">
+                            <img class="editable-image" data-cms-id="memory-4-img"
+                                src="https://placehold.co/400x500?text=memory-card" alt="Bike ride">
                         </div>
                         <div class="memory-info">
-                            <h3>tution days</h3>
-                            <p>Chaos, food, pranks and late-night chats</p>
+                            <h3 class="editable-text" data-cms-id="memory-4-title">Bike ride</h3>
+                            <p class="editable-text" data-cms-id="memory-4-desc">Every trip is a story I want to write
+                                with you.</p>
+                        </div>
+                    </div>
+                    <!-- Item 5 -->
+                    <div class="memory-card">
+                        <div class="memory-img">
+                            <img class="editable-image" data-cms-id="memory-5-img"
+                                src="https://placehold.co/400x500?text=memory-card" alt="days">
+                        </div>
+                        <div class="memory-info">
+                            <h3 class="editable-text" data-cms-id="memory-5-title">tution days</h3>
+                            <p class="editable-text" data-cms-id="memory-5-desc">Chaos, food, pranks and late-night
+                                chats</p>
                         </div>
                     </div>
                     <!-- Item 6 -->
@@ -150,53 +173,60 @@
         <section id="collage" class="section collage-section">
             <div class="collage-header text-center reveal">
                 <h2 class="section-title">Little Moments, Big Memories 💞</h2>
-                
-            <div class="scrapbook-container">
-                <!-- Photo 1 -->
-                <div class="polaroid-item reveal" data-caption="That time we got lost but found the best pizza 🍕">
-                    <div class="photo-frame">
-                        <img src="https://placehold.co/400x500?text=Pizza+Night" alt="Memory 1">
-                        <div class="tape-strip"></div>
-                    </div>
-                    <div class="handwritten-caption">Best Mistake Ever</div>
-                </div>
 
-                <!-- Photo 2 -->
-                <div class="polaroid-item reveal" data-caption="Your smile is my favorite sunrise ☀️">
-                    <div class="photo-frame">
-                        <img src="https://placehold.co/400x500?text=Sunrise+Smile" alt="Memory 2">
-                        <div class="tape-strip"></div>
+                <div class="scrapbook-container">
+                    <!-- Photo 1 -->
+                    <div class="polaroid-item reveal" data-caption="That time we got lost but found the best pizza 🍕">
+                        <div class="photo-frame">
+                            <img class="editable-image" data-cms-id="polaroid-1-img"
+                                src="https://placehold.co/400x500?text=Pizza+Night" alt="Memory 1">
+                            <div class="tape-strip"></div>
+                        </div>
+                        <div class="handwritten-caption editable-text" data-cms-id="polaroid-1-caption">Best Mistake
+                            Ever</div>
                     </div>
-                    <div class="handwritten-caption">Cuddles and kisses</div>
-                </div>
 
-                <!-- Photo 3 -->
-                <div class="polaroid-item reveal" data-caption="Late night drives and endless talks 🚗">
-                    <div class="photo-frame">
-                        <img src="https://placehold.co/400x500?text=Late+Night+Drive" alt="Memory 3">
-                        <div class="tape-strip"></div>
+                    <!-- Photo 2 -->
+                    <div class="polaroid-item reveal" data-caption="Your smile is my favorite sunrise ☀️">
+                        <div class="photo-frame">
+                            <img class="editable-image" data-cms-id="polaroid-2-img"
+                                src="https://placehold.co/400x500?text=Sunrise+Smile" alt="Memory 2">
+                            <div class="tape-strip"></div>
+                        </div>
+                        <div class="handwritten-caption editable-text" data-cms-id="polaroid-2-caption">Cuddles and
+                            kisses</div>
                     </div>
-                    <div class="handwritten-caption">cuties</div>
-                </div>
 
-                <!-- Photo 4 -->
-                <div class="polaroid-item reveal" data-caption="Fancy dinner where you spilled the wine 🍷">
-                    <div class="photo-frame">
-                        <img src="https://placehold.co/400x500?text=Fancy+Dinner" alt="Memory 4">
-                        <div class="tape-strip"></div>
+                    <!-- Photo 3 -->
+                    <div class="polaroid-item reveal" data-caption="Late night drives and endless talks 🚗">
+                        <div class="photo-frame">
+                            <img class="editable-image" data-cms-id="polaroid-3-img"
+                                src="https://placehold.co/400x500?text=Late+Night+Drive" alt="Memory 3">
+                            <div class="tape-strip"></div>
+                        </div>
+                        <div class="handwritten-caption editable-text" data-cms-id="polaroid-3-caption">cuties</div>
                     </div>
-                    <div class="handwritten-caption">ussss❤️</div>
-                </div>
 
-                <!-- Photo 5 -->
-                <div class="polaroid-item reveal" data-caption="Just us being us. Crazy and in love.">
-                    <div class="photo-frame">
-                        <img src="https://placehold.co/400x500?text=Crazy+Love" alt="Memory 5">
-                        <div class="tape-strip"></div>
+                    <!-- Photo 4 -->
+                    <div class="polaroid-item reveal" data-caption="Fancy dinner where you spilled the wine 🍷">
+                        <div class="photo-frame">
+                            <img class="editable-image" data-cms-id="polaroid-4-img"
+                                src="https://placehold.co/400x500?text=Fancy+Dinner" alt="Memory 4">
+                            <div class="tape-strip"></div>
+                        </div>
+                        <div class="handwritten-caption editable-text" data-cms-id="polaroid-4-caption">ussss❤️</div>
                     </div>
-                    <div class="handwritten-caption">Goofballs</div>
+
+                    <!-- Photo 5 -->
+                    <div class="polaroid-item reveal" data-caption="Just us being us. Crazy and in love.">
+                        <div class="photo-frame">
+                            <img class="editable-image" data-cms-id="polaroid-5-img"
+                                src="https://placehold.co/400x500?text=Crazy+Love" alt="Memory 5">
+                            <div class="tape-strip"></div>
+                        </div>
+                        <div class="handwritten-caption editable-text" data-cms-id="polaroid-5-caption">Goofballs</div>
+                    </div>
                 </div>
-            </div>
         </section>
 
         <!-- Love Letter Section -->
@@ -209,9 +239,9 @@
                     <div class="body"></div>
                     <div class="letter">
                         <div class="letter-content">
-                            <h3>My Dearest,</h3>
-                            <p>
-                                Every day with you feels like a page out of my favorite book. 
+                            <h3 class="editable-text" data-cms-id="letter-salutation">My Dearest,</h3>
+                            <p class="editable-text" data-cms-id="letter-body">
+                                Every day with you feels like a page out of my favorite book.
                                 You are my joy, my laughter, and my greatest adventure.
                                 <br><br>
                                 I love you more than words can say.
@@ -236,17 +266,18 @@
                 <div class="scroll-top-roll"></div>
                 <div class="scroll-paper">
                     <div class="scroll-content">
-                        <h2 class="promise-title">My Promise to You</h2>
+                        <h2 class="promise-title editable-text" data-cms-id="promise-title">Our Promise to Each Other
+                        </h2>
                         <div class="divider">✨</div>
                         <div class="promise-lines-container">
-                            <p class="line">I promise to always be your safe space.</p>
-                            <p class="line">To laugh with you until our stomachs hurt.</p>
-                            <p class="line">To hold your hand through every storm.</p>
-                            <p class="line">And to love you, fiercely and softly, for all my days.</p>
-                        </div>
-                        <div class="signature">
-                            Forever yours, <br> 
-                            <span class="sign-name">name</span>
+                            <p class="line editable-text" data-cms-id="promise-1">I promise to always be your safe
+                                space.</p>
+                            <p class="line editable-text" data-cms-id="promise-2">To laugh with you until our stomachs
+                                hurt.</p>
+                            <p class="line editable-text" data-cms-id="promise-3">To hold your hand through every storm.
+                            </p>
+                            <p class="line editable-text" data-cms-id="promise-4">And to love you, fiercely and softly,
+                                for all my days.</p>
                         </div>
                     </div>
                 </div>
@@ -260,9 +291,9 @@
     <div id="letter-overlay" class="letter-overlay">
         <div class="letter-paper">
             <div class="letter-content-view">
-                <h3>My Dearest,</h3>
-                <p>
-                    Every day with you feels like a page out of my favorite book. 
+                <h3 class="editable-text" data-cms-id="letter-salutation">My Dearest,</h3>
+                <p class="editable-text" data-cms-id="letter-body">
+                    Every day with you feels like a page out of my favorite book.
                     You are my joy, my laughter, and my greatest adventure.
                     <br><br>
                     I love you more than words can say.
@@ -284,6 +315,23 @@
         </div>
     </div>
 
+    <!-- Firebase SDK (Version 8 for simplicity in vanilla JS) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
     <script src="js/script.js"></script>
+    <script src="js/cms.js"></script>
+
+    <!-- Admin Link (Discreet) -->
+    <!-- Admin Link (Visible) -->
+    <a href="admin.html" id="edit-toggle-btn"
+        style="position: fixed; bottom: 20px; left: 20px; background: rgba(255, 255, 255, 0.9); color: #333; border: 1px solid #ccc; padding: 10px 15px; border-radius: 30px; cursor: pointer; font-size: 14px; font-weight: bold; z-index: 99999; box-shadow: 0 4px 10px rgba(0,0,0,0.2); text-decoration: none;">
+        ⚙️ Edit Site
+    </a>
+
+    <!-- Hidden File Input for Image Uploads -->
+    <input type="file" id="cms-file-input" style="display: none;" accept="image/*">
 </body>
+
 </html>
