@@ -177,8 +177,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     /* --- Relationship Timer --- */
+    let startDate = new Date('2021-07-07T16:00:00');
+
+    window.setRelationshipDate = (val) => {
+        if (val) {
+            startDate = new Date(val);
+            updateTimer();
+        }
+    };
+
     function updateTimer() {
-        const startDate = new Date('2021-07-07T16:00:00');
         const now = new Date();
 
         let years = now.getFullYear() - startDate.getFullYear();

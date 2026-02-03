@@ -48,6 +48,7 @@ const cmsSchema = [
     {
         title: "❤️ Top Section",
         fields: [
+            { id: "start-date", label: "Start Date (YYYY-MM-DDTHH:mm:ss)", type: "text", default: "2021-07-07T16:00:00" },
             { id: "hero-name-1", label: "Partner 1 Name", type: "text", default: "Aashu" },
             { id: "hero-name-2", label: "Partner 2 Name", type: "text", default: "Jasveer" },
             { id: "hero-sub-line-1", label: "Subtitle Line 1 (Bold)", type: "text", default: "We’re building a life together." },
@@ -169,6 +170,10 @@ function applySimpleMappings(data) {
 }
 
 function applyComplexMappings(data) {
+    if (window.setRelationshipDate) {
+        window.setRelationshipDate(data['start-date'] || "2021-07-07T16:00:00");
+    }
+
     const name1 = data['hero-name-1'] || "Aashu";
     const name2 = data['hero-name-2'] || "Jasveer";
     const heroTitleEl = document.querySelector('[data-cms-id="hero-title"]');
