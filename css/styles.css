@@ -356,11 +356,23 @@ h3 {
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
+/* Enable manual scroll */
 .marquee-container {
     width: 100%;
-    overflow-x: hidden;
+    overflow-x: auto;
+    /* Allow Scroll */
     padding: 40px 0;
     position: relative;
+    /* Hide scrollbar */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+.marquee-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
 }
 
 /* Fade mask for marquee edges */
@@ -374,9 +386,8 @@ h3 {
 .marquee-content {
     display: flex;
     gap: 40px;
-    animation: scrollHorizontal 30s linear infinite;
     width: max-content;
-    /* Ensure it fits content */
+    /* Animation removed for JS control */
 }
 
 /* Pause on hover */
