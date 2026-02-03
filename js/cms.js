@@ -5,13 +5,15 @@
     - Reconstructs structure automatically
 */
 
+// Real Config
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAceUWOY3LAo_xpzlwwRppVtqafelYYoo8",
+    authDomain: "aashu-1ebd4.firebaseapp.com",
+    projectId: "aashu-1ebd4",
+    storageBucket: "aashu-1ebd4.firebasestorage.app",
+    messagingSenderId: "1044014013718",
+    appId: "1:1044014013718:web:0f38deffc2e693f14c4437",
+    measurementId: "G-CCYP268K0B"
 };
 
 if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
