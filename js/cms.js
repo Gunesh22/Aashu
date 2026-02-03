@@ -4,14 +4,16 @@
     - Handles Newlines cleanly
     - Reconstructs structure automatically
     - Shows Upload Progress Bars
+    - Compresses Images before Upload
+    - Supports Date Picker
 */
 
-// Real Config
+// Not using Firebase Config anymore for Storage, but needed for Firestore
 const firebaseConfig = {
     apiKey: "AIzaSyAceUWOY3LAo_xpzlwwRppVtqafelYYoo8",
     authDomain: "aashu-1ebd4.firebaseapp.com",
     projectId: "aashu-1ebd4",
-    storageBucket: "aashu-1ebd4.firebasestorage.app",
+    storageBucket: "aashu-1ebd4.firebasestorage.app", // Unused
     messagingSenderId: "1044014013718",
     appId: "1:1044014013718:web:0f38deffc2e693f14c4437",
     measurementId: "G-CCYP268K0B"
@@ -22,13 +24,12 @@ if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
 }
 
 let db = typeof firebase !== 'undefined' ? firebase.firestore() : null;
-let storage = typeof firebase !== 'undefined' ? firebase.storage() : null;
+// let storage = firebase.storage(); // DISABLED
 
 const collectionName = "site_content";
 const docId = "main_content";
 
 // --- HELPER: TEXT CONVERSION ---
-// Robust handling for mixed content (both \n and <br>)
 function brToNewline(html) {
     if (!html) return "";
     return html.replace(/<br\s*\/?>/gi, '\n');
@@ -39,16 +40,42 @@ function newlineToBr(text) {
     return text.replace(/\n/g, '<br>');
 }
 
-/* 
-    SCHEMA STRATEGY:
-    - Textareas use \n for defaults (Code Cleanliness)
-    - View Mode converts \n to <br>
-*/
+// --- HELPER: IMAGE COMPRESSION ---
+function compressImage(file) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const maxWidth = 1000; // Limit width to 1000px
+            const scale = maxWidth / img.width;
+
+            // If already small, return original
+            if (scale >= 1) {
+                resolve(file);
+                return;
+            }
+
+            canvas.width = maxWidth;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            // Compress to JPEG 80%
+            canvas.toBlob(blob => {
+                resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+            }, 'image/jpeg', 0.8);
+        }
+    });
+}
+
+// --- SCHEMA ---
 const cmsSchema = [
     {
         title: "❤️ Top Section",
         fields: [
-            { id: "start-date", label: "Start Date (YYYY-MM-DDTHH:mm:ss)", type: "text", default: "2021-07-07T16:00:00" },
+            // Date Picker (datetime-local)
+            { id: "start-date", label: "Start Date", type: "datetime-local", default: "2021-07-07T16:00" },
             { id: "hero-name-1", label: "Partner 1 Name", type: "text", default: "Aashu" },
             { id: "hero-name-2", label: "Partner 2 Name", type: "text", default: "Jasveer" },
             { id: "hero-sub-line-1", label: "Subtitle Line 1 (Bold)", type: "text", default: "We’re building a life together." },
@@ -112,7 +139,6 @@ const cmsSchema = [
         title: "💌 Love Letter",
         fields: [
             { id: "letter-salutation", label: "Salutation", type: "text", default: "My Dearest," },
-            // Using \n here for clean code. View logic will handle conversion.
             { id: "letter-body", label: "Message Body", type: "textarea", default: "Every day with you feels like a page out of my favorite book. You are my joy, my laughter, and my greatest adventure.\n\nI love you more than words can say.\n\nForever yours,\n❤️" },
         ]
     },
@@ -139,13 +165,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- VIEW LOGIC (Reconstructs HTML) ---
+// --- VIEW LOGIC ---
 function initViewPage() {
     loadContent((data) => {
         if (!data) return;
-
         applySimpleMappings(data);
-        applyComplexMappings(data); // Reconstruct structural HTML
+        applyComplexMappings(data);
     });
 }
 
@@ -153,13 +178,11 @@ function applySimpleMappings(data) {
     cmsSchema.forEach(section => {
         section.fields.forEach(field => {
             const val = data[field.id] || field.default;
-
             let el = document.querySelector(`[data-cms-id="${field.id}"]`);
             if (el) {
                 if (field.type === 'image') {
                     el.src = val;
                 } else if (field.type === 'textarea') {
-                    // Convert stored newlines to <br> for display
                     el.innerHTML = newlineToBr(val);
                 } else {
                     el.innerHTML = val;
@@ -171,7 +194,8 @@ function applySimpleMappings(data) {
 
 function applyComplexMappings(data) {
     if (window.setRelationshipDate) {
-        window.setRelationshipDate(data['start-date'] || "2021-07-07T16:00:00");
+        // Use default if not set
+        window.setRelationshipDate(data['start-date'] || "2021-07-07T16:00");
     }
 
     const name1 = data['hero-name-1'] || "Aashu";
@@ -191,7 +215,6 @@ function applyComplexMappings(data) {
 
 // --- ADMIN LOGIC ---
 function initAdminPage() {
-    // Simple Password Check
     const password = prompt("Unknown user detected. Enter Admin Password:");
     if (password !== "openingbatsman") {
         alert("Access Denied!");
@@ -204,7 +227,6 @@ function initAdminPage() {
         currentData = data || {};
         populateAdminForm(currentData);
         document.getElementById('loading').style.display = 'none';
-
         const first = document.querySelector('.section-content');
         if (first) first.classList.add('open');
     });
@@ -244,13 +266,17 @@ function generateAdminUI() {
                 fileIn.type = 'file';
                 fileIn.id = `file-${field.id}`;
                 fileIn.accept = 'image/*';
-                fileIn.addEventListener('change', (e) => {
+                fileIn.addEventListener('change', async (e) => {
                     if (e.target.files[0]) {
+                        // Compress Image Here
                         const f = e.target.files[0];
-                        pendingUploads.set(field.id, f);
+                        const compressed = await compressImage(f);
+
+                        pendingUploads.set(field.id, compressed);
+
                         const reader = new FileReader();
                         reader.onload = (ev) => img.src = ev.target.result;
-                        reader.readAsDataURL(f);
+                        reader.readAsDataURL(compressed);
                     }
                 });
 
@@ -265,13 +291,12 @@ function generateAdminUI() {
             } else if (field.type === 'textarea') {
                 const area = document.createElement('textarea');
                 area.id = `input-${field.id}`;
-                // Input always sees \n. 
-                // brToNewline handles mixed content if DB has <br>
                 area.value = brToNewline(field.default);
                 row.appendChild(area);
             } else {
                 const input = document.createElement('input');
-                input.type = 'text';
+                // Support datetime-local
+                input.type = field.type;
                 input.id = `input-${field.id}`;
                 input.value = field.default;
                 row.appendChild(input);
@@ -292,10 +317,14 @@ function populateAdminForm(data) {
             if (field.type === 'image') {
                 document.getElementById(`preview-${field.id}`).src = val;
             } else if (field.type === 'textarea') {
-                // Ensure db content is converted to \n for editing
                 document.getElementById(`input-${field.id}`).value = brToNewline(val);
             } else {
-                document.getElementById(`input-${field.id}`).value = val;
+                let v = val;
+                // Fix for Datetime: Remove seconds if present to fit input
+                if (field.type === 'datetime-local' && v.length > 16) {
+                    v = v.slice(0, 16);
+                }
+                document.getElementById(`input-${field.id}`).value = v;
             }
         });
     });
@@ -341,6 +370,7 @@ async function saveAdminChanges() {
                     formData.append("image", file);
 
                     const xhr = new XMLHttpRequest();
+                    // Optional: Append name to upload? ImgBB handles it.
                     xhr.open("POST", `https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, true);
 
                     xhr.upload.onprogress = (e) => {
@@ -378,7 +408,7 @@ async function saveAdminChanges() {
             pendingUploads.clear();
         }
 
-        // Save Text fields to Firestore (Still needed!)
+        // Save Text fields to Firestore
         cmsSchema.forEach(section => {
             section.fields.forEach(field => {
                 if (field.type !== 'image') {
@@ -407,6 +437,7 @@ async function saveAdminChanges() {
 }
 
 function loadContent(cb) {
+    if (!db) { cb({}); return; }
     db.collection(collectionName).doc(docId).get().then(doc => {
         cb(doc.exists ? doc.data() : {});
     }).catch(e => cb({}));
